@@ -1,23 +1,46 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
+const verify = require('./verifyToken');
 
-router.post('/register', (req, res) => {
-    res.send('Register');
+router.get('/', (req, res) => {
+    res.send('home');
+    console.log(User.length)
 })
 
-router.get('/', async (req, res) => {
-    res.send('hello');
+router.post('/register', async (req, res) => {
+    const emailExist = await User.findOne({ email: req.body.email });
+    if (emailExist) return res.status(400).send('Email already exists');
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+    const user = new User({
+        id: req.body.id,
+        name: req.body.name,
+        email: req.body.email,
+        password: hashedPassword,
+        status: req.body.status
+    });
+    try {
+        const savedUser = await user.save();
+        res.send(savedUser);
+    } catch (error) {
+        console.log(error);
+        res.status(400).send(error)
+    }
 })
 
-router.get('/allusers', async (req, res) => {
+router.get('/allusers', verify, async (req, res) => {
     try {
         const users = await User.find();
         res.send({ users })
-    } catch (err) {
-        console.log(err)
-        throw err
+    } catch (error) {
+        console.log(error)
+        throw error
     }
 })
 
@@ -25,28 +48,37 @@ router.get('/one/:id', async (req, res) => {
     try {
         const user = await User.findOne({id: req.params.id})
         res.send({ user })
-    } catch (err) {
-        console.log(err)
-        throw err
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+})
+
+router.delete('/one/:id', async (req, res) => {
+    try {
+        await User.findOneAndDelete({ id: req.params.id });
+        res.send('User ' + req.params.id + ' deleted')
+    } catch (error) {
+        console.log(error)
+        throw error
     }
 })
 
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
-        console.log(req.body.email)
         if (!user) return res.status(400).send('Email is not found');
-        if (req.body.password != user.password) return res.status(400).send('Wrong password');
-
 
         const validPass = await bcrypt.compare(req.body.password, user.password);
-        console.log(validPass)
-        // if (!validPass) return res.status(400).send('Invalid Password');
-        res.send('Logged in ! Welcome ' + user.name);
+        if (!validPass) return res.status(400).send('Invalid Password');
 
-    } catch (err) {
-        console.log(err)
-        throw err
+        // Create and assign a token
+        const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
+        res.header('auth-token', token).send(token);
+
+    } catch (error) {
+        console.log(error)
+        throw error
     }
 })
 

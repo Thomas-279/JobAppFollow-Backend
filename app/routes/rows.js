@@ -5,9 +5,9 @@ router.get('/allrows', async (req, res) => {
     try {
         const rows = await Rows.find();
         res.send({ rows })
-    } catch (err) {
-        console.log(err)
-        throw err
+    } catch (error) {
+        console.log(error)
+        throw error
     }
 })
 
