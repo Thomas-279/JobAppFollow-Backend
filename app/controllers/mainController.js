@@ -20,13 +20,13 @@ const mainController = {
     getOneUser: async (req, res) => {
         const id = parseInt(req.params.id).toString();
         console.log(id);
-        const user = users.find(user => user.id === id);
+        const user = users.findOne(user => user.id === id);
         res.status(200).json(user);
     },
 
     deleteOneUser: async (req, res) => {
         const id = parseInt(req.params.id).toString();
-        const row = users.find(user => user.id === id);
+        const row = users.findOne(user => user.id === id);
         users.splice(users.indexOf(row), 1);
         res.status(200).json(users);
     },
@@ -38,13 +38,13 @@ const mainController = {
     getOneRow: async (req, res) => {
         const id = parseInt(req.params.id).toString();
         console.log(id);
-        const row = rows.find(row => row.id === id);
+        const row = rows.findOne(row => row.id === id);
         res.status(200).json(row);
     },
 
     deleteOneRow: async (req, res) => {
         const id = parseInt(req.params.id).toString();
-        const row = rows.find(row => row.id === id);
+        const row = rows.findOne(row => row.id === id);
         rows.splice(rows.indexOf(row), 1);
         res.status(200).json(rows);
     }
