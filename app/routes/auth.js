@@ -19,7 +19,6 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     const user = new User({
-        id: req.body.id,
         name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
@@ -74,7 +73,9 @@ router.post('/login', async (req, res) => {
 
         // Create and assign a token
         const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET);
-        res.header('auth-token', token).send(token);
+        res.status(200)
+            .header('auth-token', token)
+            .send({ email: user.email, name: user.name, status: user.status, token: token });
 
     } catch (error) {
         console.log(error)
