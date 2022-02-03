@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const RowsSchema = new mongoose.Schema({
-    id: String,
+    id: Number,
     firm: String,
     date: String,
     via: String,

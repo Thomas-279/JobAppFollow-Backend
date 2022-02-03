@@ -43,7 +43,7 @@ router.get('/allusers', verify, async (req, res) => {
     }
 })
 
-router.get('/one/:id', async (req, res) => {
+router.get('/one/:id', verify, async (req, res) => {
     try {
         const user = await User.findOne({id: req.params.id})
         res.send({ user })
@@ -53,7 +53,7 @@ router.get('/one/:id', async (req, res) => {
     }
 })
 
-router.delete('/one/:id', async (req, res) => {
+router.delete('/one/:id', verify, async (req, res) => {
     try {
         await User.findOneAndDelete({ id: req.params.id });
         res.send('User ' + req.params.id + ' deleted')
