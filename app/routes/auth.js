@@ -81,6 +81,14 @@ router.post('/login', async (req, res) => {
         console.log(error)
         throw error
     }
+});
+
+router.get('/verifyToken', verify, async(req, res) => {
+    try {
+        res.send('Token Valid')
+    } catch (error) {
+        console.log('token invalid', error);
+    }
 })
 
 
